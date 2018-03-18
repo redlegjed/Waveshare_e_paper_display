@@ -88,6 +88,22 @@ SET_RAM_X_ADDRESS_COUNTER                   = 0x4E
 SET_RAM_Y_ADDRESS_COUNTER                   = 0x4F
 TERMINATE_FRAME_READ_WRITE                  = 0xFF
 
+# Full update - flickers
+LUT_FULL_UPDATE = [
+    0x22, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x11,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E,
+    0x01, 0x00, 0x00, 0x00, 0x00, 0x00
+]
+
+# Partial update - smoother
+LUT_PARTIAL_UPDATE  = [
+    0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x0F, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+]
+
 # SPI device, bus = 0, device = 0
 #SPI = spidev.SpiDev(0, 0)
 #SPI = spidev.SpiDev(0, 1)
@@ -99,7 +115,7 @@ TERMINATE_FRAME_READ_WRITE                  = 0xFF
 # e-paper screen class
 # ===================================
 
-class EPD():
+class EPD(scr.Screen):
     """
     e-paper display class
 
@@ -114,24 +130,13 @@ class EPD():
 
     # Look up tables for screen refresh mode
 
-    # Full update - flickers
-    lut_full_update = [
-        0x22, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x11,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E,
-        0x01, 0x00, 0x00, 0x00, 0x00, 0x00
-    ]
-
-    # Partial update - smoother
-    lut_partial_update  = [
-        0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x0F, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    ]
+    
     
     def __init__(self,reset_pin=RST_PIN,dc_pin=DC_PIN,busy_pin=BUSY_PIN,
-                 spi_bus=0,spi_dev=1):
+                 spi_bus=0,spi_dev=1,
+                 width=128,height=250,
+                 lut_full_update=LUT_FULL_UPDATE,
+                 lut_partial_update=LUT_PARTIAL_UPDATE):
         """
         Initialise class
         * Setup pins
@@ -153,8 +158,23 @@ class EPD():
 
         spi_device: int
             0 or 1 [Default 1]
+
+        width : int
+            width of screen in pixels
+
+        height : int
+            height of screen in pixels
+
+        lut_full_update: list
+            Lookup table for full update of screen
+            Supplied by manufacturer
+
+        lut_partial_update : list
+            Lookup table for partial update of screen
+            Supplied by manufacturer
         
         """
+        super().__init__(width,height)
         
         # Setup pins
         self.reset_pin = reset_pin
@@ -163,10 +183,12 @@ class EPD():
         self.cs_pin = CS_PIN[spi_dev]
         self.width = EPD_WIDTH
         self.height = EPD_HEIGHT
+        self.lut_partial_update = lut_partial_update
+        self.lut_full_update = lut_full_update
         self.lut = self.lut_full_update
 
         # Screen management
-        self.screen = scr.Screen(width=self.width,height=self.height)
+        #self.screen = scr.Screen(width=self.width,height=self.height)
         
         
 
@@ -174,9 +196,11 @@ class EPD():
         self.SPI = spidev.SpiDev(spi_bus, spi_dev)
 
         # Initialise screen
-        self.epd_init()
-        self.set_to_partial_update()
-        
+        self.init(self.lut_partial_update)
+        #self.set_to_partial_update()
+
+
+    
 
 
     def update(self):
@@ -185,7 +209,7 @@ class EPD():
         Run this after making changes to a screen
         """
 
-        self.set_frame_memory(self.screen.image,0,0)
+        self.set_frame_memory(self.image,0,0)
         self.display_frame()
         
 
