@@ -18,10 +18,10 @@ Create the e-paper display object
 
 Draw shapes on screen
 
-	epd.screen.rect((10,10,40,40),fill=0)
-	epd.screen.ellipse((10,10,40,40),fill=0)
-	epd.screen.line((80,80,140,140),fill=0,width=5)
-	epd.screen.text((50,130),'Hello')
+	epd.rect((10,10,40,40),fill=0)
+	epd.ellipse((10,10,40,40),fill=0)
+	epd.line((80,80,140,140),fill=0,width=5)
+	epd.text((50,130),'Hello')
 
 Update screen with new shapes
 	
