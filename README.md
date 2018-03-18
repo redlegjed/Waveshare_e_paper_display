@@ -12,7 +12,8 @@ See www.waveshare.com/wiki/2.13inch_e-Paper_HAT for details of the screen hardwa
 
 
 Create the e-paper display object
-	
+
+	from waveshare_e_paper_lib import EPD
 	epd = EPD()
 
 Draw shapes on screen
