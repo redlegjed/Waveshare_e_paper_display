@@ -1,5 +1,12 @@
 # Waveshare_e_paper_display
-Python library for Waveshare 2.13" e-paper display
+Python library for Waveshare 2.13" e-paper display for use on Raspberry Pi
+
+See www.waveshare.com/wiki/2.13inch_e-Paper_HAT for details of the screen hardware
+
+## Dependencies
+
+* SPI interface on R-Pi should be enabled
+* Python libraries spidev and PIL (think both come with R-Pi now)
 
 ## Example usage
 
