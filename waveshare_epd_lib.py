@@ -174,7 +174,7 @@ class EPD(scr.Screen):
             Supplied by manufacturer
         
         """
-        super().__init__(width,height)
+        scr.Screen.__init__(self,width,height)
         
         # Setup pins
         self.reset_pin = reset_pin
@@ -186,18 +186,14 @@ class EPD(scr.Screen):
         self.lut_partial_update = lut_partial_update
         self.lut_full_update = lut_full_update
         self.lut = self.lut_full_update
-
-        # Screen management
-        #self.screen = scr.Screen(width=self.width,height=self.height)
-        
-        
+    
 
         # Connect to screen over SPI
         self.SPI = spidev.SpiDev(spi_bus, spi_dev)
 
         # Initialise screen
-        self.init(self.lut_partial_update)
-        #self.set_to_partial_update()
+        self.epd_init()
+        self.set_to_partial_update()
 
 
     
@@ -213,10 +209,7 @@ class EPD(scr.Screen):
         self.display_frame()
         
 
-        # Toggle screen between 0 and 1
-        #self.current_screen = not self.current_screen 
-    
-
+        
     def epd_init(self):
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
@@ -256,11 +249,11 @@ class EPD(scr.Screen):
         if (self.epd_init() != 0):
             return -1
         # EPD hardware init start
-        self.lut = lut
+        #self.lut = lut
         self.reset()
         self.send_command(DRIVER_OUTPUT_CONTROL)
-        self.send_data((EPD_HEIGHT - 1) & 0xFF)
-        self.send_data(((EPD_HEIGHT - 1) >> 8) & 0xFF)
+        self.send_data((self.height - 1) & 0xFF)
+        self.send_data(((self.height - 1) >> 8) & 0xFF)
         self.send_data(0x00)                     # GD = 0 SM = 0 TB = 0
         self.send_command(BOOSTER_SOFT_START_CONTROL)
         self.send_data(0xD7)
@@ -274,7 +267,7 @@ class EPD(scr.Screen):
         self.send_data(0x08)                     # 2us per line
         self.send_command(DATA_ENTRY_MODE_SETTING)
         self.send_data(0x03)                     # X increment Y increment
-        self.set_lut(self.lut)
+        self.set_lut(lut)
         # EPD hardware init end
         return 0
 
@@ -301,11 +294,11 @@ class EPD(scr.Screen):
  #  @brief: set the look-up table register
  ##
     def set_lut(self, lut):
-        self.lut = lut
+        lut = lut
         self.send_command(WRITE_LUT_REGISTER)
         # the length of look-up table is 30 bytes
         for i in range(0, len(lut)):
-            self.send_data(self.lut[i])
+            self.send_data(lut[i])
 
 ##
  #  @brief: convert an image to a buffer
@@ -438,6 +431,8 @@ class EPD(scr.Screen):
         self.set_to_full_update()
         self.clear_frame_memory(255)
         self.display_frame()
+        self.clear_frame_memory(255)
+        self.display_frame()
 
         # Return to partial update mode
         self.set_to_partial_update()
@@ -462,6 +457,16 @@ def moving_box(epd):
         epd.update()
 
         
-
+def test_shapes(epd):
+    """
+    Draw some shapes
+    """
+    epd.rect((10,10,50,70),fill=0)
+    epd.text((10,100),"hello")
+    epd.line((5,200,120,200),width=5)
+    epd.ellipse((110,220,120,240),fill=255)
+    epd.update()
+    
+    
     
 

@@ -70,7 +70,7 @@ class Screen():
 
     @property
     def image(self):
-        self.clear_screen()
+        self.blank_screen()
         for name,shape in self.shapes.items():
             #shape.function(*shape.args,**shape.kwargs)
             shape.draw()
@@ -104,7 +104,7 @@ class Screen():
         self.shape_counter = 0
         
 
-    def clear_screen(self):
+    def blank_screen(self):
         """
         Blank the screen
         """
