@@ -21,7 +21,12 @@ Draw shapes on screen
 	epd.screen.rect((10,10,40,40),fill=0)
 	epd.screen.ellipse((10,10,40,40),fill=0)
 	epd.screen.line((80,80,140,140),fill=0,width=5)
+	epd.screen.text((50,130),'Hello')
 
 Update screen with new shapes
 	
 	epd.update()
+	
+Clear screen completely. Note the screen flashes during this.
+
+	epd.clear_screen()

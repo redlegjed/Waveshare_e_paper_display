@@ -99,7 +99,7 @@ TERMINATE_FRAME_READ_WRITE                  = 0xFF
 # e-paper screen class
 # ===================================
 
-class EPD:
+class EPD():
     """
     e-paper display class
 
@@ -167,9 +167,7 @@ class EPD:
 
         # Screen management
         self.screen = scr.Screen(width=self.width,height=self.height)
-        #self.screen0 = scr.Screen(width=self.width,height=self.height)
-        #self.screen1 = scr.Screen(width=self.width,height=self.height)
-        #self.current_screen = False # False = screen0, True = screen1
+        
         
 
         # Connect to screen over SPI
@@ -180,21 +178,6 @@ class EPD:
         self.set_to_partial_update()
         
 
-##    @property
-##    def screen(self):
-##        """
-##        Return next screen to be displayed
-##
-##        Output
-##        ------
-##        screen : Screen() class object
-##            current screen
-##            
-##        """
-##        if self.current_screen:
-##            return self.screen0
-##        else:
-##            return self.screen1
 
     def update(self):
         """
@@ -419,6 +402,23 @@ class EPD:
         self.send_command(DEEP_SLEEP_MODE)
         self.wait_until_idle()
 
+
+    def clear_screen(self):
+        """
+        Clear screen using full update method.
+        This makes the screen flash, but cleans off all the pixels.
+        
+        """
+        
+        # Set to full update mode and clear memory
+        self.set_to_full_update()
+        self.clear_frame_memory(255)
+        self.display_frame()
+
+        # Return to partial update mode
+        self.set_to_partial_update()
+        
+        
 
 # =====================================================
 # Demo functions

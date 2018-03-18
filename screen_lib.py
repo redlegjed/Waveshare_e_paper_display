@@ -92,7 +92,7 @@ class Screen():
         return self.shapes[key]
 
 
-    def reset(self):
+    def reset_screen(self):
         """
         Clear all shapes from memory
         """
@@ -226,6 +226,32 @@ class Screen():
 
         
         self.shapes[name] = Shape(name,self._draw.polygon,args,kwargs)
+        self.shape_counter +=1
+
+
+    def text(self,xy,text_str,fill=0,font=None,name=None):
+        """
+        Draw text
+
+        Inputs
+        -----------
+        xy: list of int
+            x,y coordinates of where text starts
+            [x,y]
+
+
+        fill : int
+            text colour [default=0 (black)]
+
+        """
+        if name is None:
+            name = 'text%i' % self.shape_counter
+            
+        args = [xy,text_str]
+        kwargs = {'font':font,'fill':fill}
+
+        
+        self.shapes[name] = Shape(name,self._draw.text,args,kwargs)
         self.shape_counter +=1
 
 
