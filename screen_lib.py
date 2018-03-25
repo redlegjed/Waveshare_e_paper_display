@@ -31,6 +31,8 @@ from collections import OrderedDict
 
 from PIL import Image,ImageDraw,ImageFont
 
+DEFAULT_FONT = ImageFont.load_default()
+
 
 class Screen():
     """
@@ -70,9 +72,16 @@ class Screen():
 
     @property
     def image(self):
+        """
+        Return image of all the shapes
+
+        Output
+        --------
+        image : PIL image object
+            Image with all shapes rendered
+        """
         self.blank_screen()
         for name,shape in self.shapes.items():
-            #shape.function(*shape.args,**shape.kwargs)
             shape.draw()
 
         return self._image
@@ -109,7 +118,7 @@ class Screen():
         Blank the screen
         """
 
-        self._draw.rectangle((0,0,self.width,self.height),fill=255)
+        self._draw.rectangle((0,0,self.width,self.height),fill=255,outline=255)
 
         
 
@@ -229,15 +238,45 @@ class Screen():
         self.shape_counter +=1
 
 
-    def text(self,xy,text_str,fill=0,font=None,name=None):
-        """
-        Draw text
+##    def text(self,xy,text_str,fill=0,font=None,name=None):
+##        """
+##        Draw text
+##
+##        Inputs
+##        -----------
+##        xy: list of int
+##            x,y coordinates of where text starts
+##            [x,y]
+##
+##
+##        fill : int
+##            text colour [default=0 (black)]
+##
+##        """
+##        if name is None:
+##            name = 'text%i' % self.shape_counter
+##            
+##        args = [xy,text_str]
+##        kwargs = {'font':font,'fill':fill}
+##
+##        
+##        self.shapes[name] = Shape(name,self._draw.text,args,kwargs)
+##        self.shape_counter +=1
 
+
+    def text(self,xy,text_str,rotation_deg=90,fill=0,font=DEFAULT_FONT,name=None):
+        """
+        Draw text that can be rotated
+
+        
         Inputs
         -----------
         xy: list of int
             x,y coordinates of where text starts
             [x,y]
+
+        text_str: str
+            text to pring
 
 
         fill : int
@@ -246,14 +285,43 @@ class Screen():
         """
         if name is None:
             name = 'text%i' % self.shape_counter
+
+
+        # 0deg rotation needs no special treatment
+        if rotation_deg == 0:
+            args = [xy,text_str]
+            kwargs = {'font':font,'fill':fill}
             
-        args = [xy,text_str]
-        kwargs = {'font':font,'fill':fill}
+            self.shapes[name] = Shape(name,self._draw.text,args,kwargs)
+            self.shape_counter +=1
 
-        
-        self.shapes[name] = Shape(name,self._draw.text,args,kwargs)
+        # Rotated text
+        # ===============
+        img_txt = Image.new('1', font.getsize(text_str),255)
+        draw_txt = ImageDraw.Draw(img_txt)
+        draw_txt.text((0,0), text_str, font=font, fill=fill)
+        rotated_txt = img_txt.rotate(rotation_deg, expand=1)
+
+        args = [rotated_txt,xy]
+        kwargs = {}
+
+        self.shapes[name] = Shape(name,self._image.paste,args,kwargs)
         self.shape_counter +=1
-
+        
+        
+# Ref: from StackOverflow
+##        img_main = Image.new("RGB", (200, 200))
+##        font = ImageFont.load_default()
+##
+##        # Text to be rotated...
+##        rotate_text = u'This text should be rotated.'
+##
+##        # Image for text to be rotated
+##        img_txt = Image.new('L', font.getsize(rotate_text))
+##        draw_txt = ImageDraw.Draw(img_txt)
+##        draw_txt.text((0,0), rotate_text, font=font, fill=255)
+##        t = img_value_axis.rotate(90, expand=1)    
+    
 
 
 

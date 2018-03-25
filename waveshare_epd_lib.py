@@ -14,11 +14,15 @@ Create the e-paper display object
 >>> epd = EPD()
 
 Draw shapes on screen
->>> epd.screen.rect((10,10,40,40),fill=0)
->>> epd.screen.ellipse((10,10,40,40),fill=0)
->>> epd.screen.line((80,80,140,140),fill=0,width=5)
+>>> epd.rect((10,10,40,40),fill=0)
+>>> epd.ellipse((10,10,40,40),fill=0)
+>>> epd.line((80,80,140,140),fill=0,width=5)
+
 Update screen with new shapes
 >>> epd.update()
+
+Clear screen to blank image
+>>> epd.clear_screen()
 
 
 """
@@ -426,13 +430,17 @@ class EPD(scr.Screen):
         This makes the screen flash, but cleans off all the pixels.
         
         """
+        # Reset image to blank
+        self.reset_screen()
         
-        # Set to full update mode and clear memory
+        # Set to full update mode
+
+        # Update twice to put blank image in both memory areas
+        # screen flashes when doing this
         self.set_to_full_update()
-        self.clear_frame_memory(255)
-        self.display_frame()
-        self.clear_frame_memory(255)
-        self.display_frame()
+        self.update()
+        self.update()
+        
 
         # Return to partial update mode
         self.set_to_partial_update()
@@ -463,6 +471,7 @@ def test_shapes(epd):
     """
     epd.rect((10,10,50,70),fill=0)
     epd.text((10,100),"hello")
+    epd.text((10,200),"Rot")
     epd.line((5,200,120,200),width=5)
     epd.ellipse((110,220,120,240),fill=255)
     epd.update()
