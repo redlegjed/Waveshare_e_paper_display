@@ -17,6 +17,8 @@ Draw shapes on screen
 >>> epd.rect((10,10,40,40),fill=0)
 >>> epd.ellipse((10,10,40,40),fill=0)
 >>> epd.line((80,80,140,140),fill=0,width=5)
+>>> epd.text((10,100),'Hello')
+>>> epd.text((10,120),'Hello',fontsize=20)
 
 Update screen with new shapes
 >>> epd.update()
@@ -470,8 +472,8 @@ def test_shapes(epd):
     Draw some shapes
     """
     epd.rect((10,10,50,70),fill=0)
-    epd.text((10,100),"hello")
-    epd.text((10,200),"Rot")
+    epd.text((10,100),"hello",fontsize=12)
+    epd.text((10,150),"Rot",fontsize=30)
     epd.line((5,200,120,200),width=5)
     epd.ellipse((110,220,120,240),fill=255)
     epd.update()

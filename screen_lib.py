@@ -31,7 +31,16 @@ from collections import OrderedDict
 
 from PIL import Image,ImageDraw,ImageFont
 
-DEFAULT_FONT = ImageFont.load_default()
+DEFAULT_TRUETYPE_FONT = 'FreeMono.ttf'
+try:
+    # Try to load a font available for Raspberry Pi
+    DEFAULT_FONT_SIZE = 16
+    DEFAULT_FONT = ImageFont.truetype(font=DEFAULT_TRUETYPE_FONT, size=DEFAULT_FONT_SIZE)
+    FONT_IS_RESIZABLE = True
+except:
+    # If all else fails, use the PIL default
+    DEFAULT_FONT = ImageFont.load_default()
+    FONT_IS_RESIZABLE = False
 
 
 class Screen():
@@ -264,7 +273,10 @@ class Screen():
 ##        self.shape_counter +=1
 
 
-    def text(self,xy,text_str,rotation_deg=90,fill=0,font=DEFAULT_FONT,name=None):
+    def text(self,xy,text_str,rotation_deg=90,fill=0,
+             font=DEFAULT_FONT,fontsize=DEFAULT_FONT_SIZE,
+             font_filename=DEFAULT_TRUETYPE_FONT,
+             name=None):
         """
         Draw text that can be rotated
 
@@ -285,6 +297,15 @@ class Screen():
         """
         if name is None:
             name = 'text%i' % self.shape_counter
+
+        # Handle different font sizes
+        if fontsize!=DEFAULT_FONT_SIZE:
+            try:
+                # Load a different size font
+                font = ImageFont.truetype(font=font_filename, size=fontsize)
+            except:
+                font = DEFAULT_FONT
+                
 
 
         # 0deg rotation needs no special treatment
@@ -357,6 +378,9 @@ def make_test_image(scr1):
     scr1.rect([30,30,70,70])
     scr1.ellipse([50,50,90,90])
     scr1.line([1,1,45,65])
+    scr1.text((10,100),'Hello',fontsize=10)
+    scr1.text((30,100),'Hello',fontsize=20)
+    scr1.text((60,100),'Hello',fontsize=30)
     return scr1.image
 
 

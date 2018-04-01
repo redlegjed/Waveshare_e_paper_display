@@ -8,6 +8,7 @@ See www.waveshare.com/wiki/2.13inch_e-Paper_HAT for details of the screen hardwa
 * SPI interface on R-Pi should be enabled
 * Python libraries spidev and PIL (think both come with R-Pi now)
 
+
 ## Example usage
 
 
@@ -22,6 +23,7 @@ Draw shapes on screen
 	epd.ellipse((10,10,40,40),fill=0)
 	epd.line((80,80,140,140),fill=0,width=5)
 	epd.text((50,130),'Hello')
+	epd.text((10,120),'Hello',fontsize=20)
 
 Update screen with new shapes
 	
